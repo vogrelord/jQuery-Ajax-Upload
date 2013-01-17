@@ -195,7 +195,7 @@
 		});
 		form.submit(function () { //alert($(':file', this).val()); 
 		});
-		var d = $('<input type="file" multiple name="' + options.name || $.ajaxUploadSettings.name + '" />').appendTo(form);
+		var d = $('<input type="file" multiple name="' + (options.name || $.ajaxUploadSettings.name) + '" />').appendTo(form);
 		d.change(function() {			
 			if (!this.files.length) {
 				return false;
@@ -218,7 +218,7 @@
 				var id = 'ajaxupload' + new Date().getTime();
 				var form = $('<form action="' + origSettings.url + '" method="post" enctype="multipart/form-data" target="' + id + '" />').insertAfter($this);
 				var p = $('<p style="top: ' + $this.offset().top + 'px; left: ' + $this.offset().left + 'px; height: ' + $this.outerHeight() + 'px; width: ' + $this.outerWidth() + 'px; overflow: hidden; position: absolute;"/>').appendTo(form);
-				var d = $('<input type="file" multiple name="' + origSettings.name||$.ajaxUploadSettings.name + '" style="position: absolute; top: 0; right: 0; font-size: ' + $this.outerHeight() + 'px; cursor: pointer;" />').appendTo(p);
+				var d = $('<input type="file" multiple name="' + (origSettings.name||$.ajaxUploadSettings.name) + '" style="position: absolute; top: 0; right: 0; font-size: ' + $this.outerHeight() + 'px; cursor: pointer;" />').appendTo(p);
 				d.css({
 					opacity: 0
 				});
