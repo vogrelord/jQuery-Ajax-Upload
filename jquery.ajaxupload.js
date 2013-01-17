@@ -58,7 +58,7 @@
 		return fd;
 	}
 	
-	$.ajaxUploadExtractData = function( data, exist ) {
+	$.ajaxUploadExtractData = function( data, exist , options) {
 		if ( !data/* || $.isArray(data)*/ || data instanceof FormData ) return data;
 		var fd = $.ajaxUploadExtractData(exist) || new FormData();
 		if ( typeof data === "string" || data instanceof jQuery ) {
@@ -71,7 +71,7 @@
 			var kv = [];
 			for(var i = 0, len = data.length; i < len; i++) {
 				kv.push({
-					'name' : $.ajaxUploadSettings.name, 
+					'name' : options.name || $.ajaxUploadSettings.name, 
 					'value': data[i]
 				});
 			}
@@ -103,7 +103,7 @@
 		var s = jQuery.extend(true, {}, $.ajaxUploadSettings, origSettings);
 		
 		// Normalize data
-		var fd = $.ajaxUploadExtractData(s.data);
+		var fd = $.ajaxUploadExtractData(s.data, origSettings);
 		//fd = $.ajaxUploadToFormData(fd);
 		// Set nessessery settings
 		s.data = null;
@@ -195,12 +195,12 @@
 		});
 		form.submit(function () { //alert($(':file', this).val()); 
 		});
-		var d = $('<input type="file" multiple name="' + $.ajaxUploadSettings.name + '" />').appendTo(form);
+		var d = $('<input type="file" multiple name="' + options.name || $.ajaxUploadSettings.name + '" />').appendTo(form);
 		d.change(function() {			
 			if (!this.files.length) {
 				return false;
 			}
-			s.data = $.ajaxUploadExtractData(s.data, $.ajaxUploadSerializeFiles(this));
+			s.data = $.ajaxUploadExtractData(s.data, $.ajaxUploadSerializeFiles(this), options);
 			
 			$.ajaxUpload(s);
 		});
@@ -218,7 +218,7 @@
 				var id = 'ajaxupload' + new Date().getTime();
 				var form = $('<form action="' + origSettings.url + '" method="post" enctype="multipart/form-data" target="' + id + '" />').insertAfter($this);
 				var p = $('<p style="top: ' + $this.offset().top + 'px; left: ' + $this.offset().left + 'px; height: ' + $this.outerHeight() + 'px; width: ' + $this.outerWidth() + 'px; overflow: hidden; position: absolute;"/>').appendTo(form);
-				var d = $('<input type="file" multiple name="' + $.ajaxUploadSettings.name + '" style="position: absolute; top: 0; right: 0; font-size: ' + $this.outerHeight() + 'px; cursor: pointer;" />').appendTo(p);
+				var d = $('<input type="file" multiple name="' + origSettings.name||$.ajaxUploadSettings.name + '" style="position: absolute; top: 0; right: 0; font-size: ' + $this.outerHeight() + 'px; cursor: pointer;" />').appendTo(p);
 				d.css({
 					opacity: 0
 				});
@@ -273,7 +273,7 @@
 					});
 					d.change(function() {
 						var options = jQuery.extend(true, {}, origSettings);
-						options.data = $.ajaxUploadExtractData(this.files, options.data);
+						options.data = $.ajaxUploadExtractData(this.files, options.data,options);
 						$.ajaxUpload(options);
 					});
 				} else {
@@ -293,7 +293,7 @@
 					var dt = e.originalEvent.dataTransfer;  
 					var files = dt.files;
 					var options = jQuery.extend(true, {}, origSettings);
-					options.data = $.ajaxUploadExtractData(files, options.data);
+					options.data = $.ajaxUploadExtractData(files, options.data,options);
 					$.ajaxUpload(options);
 				}
 			});
