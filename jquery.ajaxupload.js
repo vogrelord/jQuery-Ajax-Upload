@@ -83,7 +83,7 @@ if ( !Function.prototype.bind ) {
 		return fd;
 	}
 
-	$.ajaxUploadExtractData = function( data, exist ) {
+	$.ajaxUploadExtractData = function( data, exist, options ) {
 		if ( !data/* || $.isArray(data)*/ || data instanceof FormData ) return data;
 		var fd = $.ajaxUploadExtractData(exist) || new FormData();
 		if ( typeof data === "string" || data instanceof jQuery ) {
@@ -96,7 +96,7 @@ if ( !Function.prototype.bind ) {
 			var kv = [];
 			for(var i = 0, len = data.length; i < len; i++) {
 				kv.push({
-					'name' : $.ajaxUploadSettings.name, 
+					'name' : options.name, 
 					'value': data[i]
 				});
 			}
@@ -220,7 +220,7 @@ if ( !Function.prototype.bind ) {
 		form.submit(function () { //alert($(':file', this).val()); 
 		});
 				
-		var d = $('<input type="file" accept="' + options.accept + '" ' + multiple + ' name="' + $.ajaxUploadSettings.name + '" />').appendTo(form);
+		var d = $('<input type="file" accept="' + options.accept + '" ' + multiple + ' name="' + options.name + '" />').appendTo(form);
 		d.change(function() {			
 			if (!this.files.length) {
 				return false;
@@ -262,7 +262,7 @@ if ( !Function.prototype.bind ) {
 				var $this = $(this);
 				var id = 'ajaxupload' + new Date().getTime() + Math.round(Math.random() * 100000);
 				var form = $('<form action="' + origSettings.url + '" method="post" enctype="multipart/form-data" target="' + id + '" />').insertAfter($this);
-				var d = $('<input type="file" ' + multiple + ' name="' + $.ajaxUploadSettings.name + '" style="border:1px solid red; position: absolute; z-index:2; top: 0; right: 0; cursor: pointer;" />').appendTo(form);
+				var d = $('<input type="file" ' + multiple + ' name="' + origSettings.name + '" style="border:1px solid red; position: absolute; z-index:2; top: 0; right: 0; cursor: pointer;" />').appendTo(form);
 				$.each(origSettings.data, function(key, value) {
 					var d = $('<input type="hidden" name="' + key + '" value="' + value + '" />').appendTo(form);
 				});
@@ -313,9 +313,13 @@ if ( !Function.prototype.bind ) {
 
 	// bind a drop event
 	$.fn.ajaxUploadDrop = function( origSettings ) {
+	
+		if (this.data('processed-drop')) return;
+		this.data('processed-drop', '1');
 		
 		var multiple = ' ';
 		if (origSettings.multiple) multiple = ' multiple ';
+		//if (origSettings.name) $.ajaxUploadSettings.name = origSettings.name;
 		
 		if ( !$.support.ajax2 ) return false;
 		var fakeSafariDragDrop = false; //navigator.userAgent.indexOf('Safari') > 0 && navigator.vendor.indexOf('Apple') !== -1;
@@ -361,7 +365,7 @@ if ( !Function.prototype.bind ) {
 					var dt = e.originalEvent.dataTransfer;  
 					var files = dt.files;							
 					var options = jQuery.extend(true, {}, origSettings);
-					options.data = $.ajaxUploadExtractData(files, options.data);
+					options.data = $.ajaxUploadExtractData(files, options.data, options);
 					options.files = files;	
 					$.ajaxUpload(options);
 				}
@@ -370,4 +374,13 @@ if ( !Function.prototype.bind ) {
 		});
 		return this;
 	}
+	
+	
+	$.fn.ajaxUploadUnbind = function() {
+		this.each(function() {
+			$(this).removeData('processed');
+			$(this).off();
+		});
+	}
+	
 })(jQuery);
